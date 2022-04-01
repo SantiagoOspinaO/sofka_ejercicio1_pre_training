@@ -1,0 +1,108 @@
+-- -----------------------------------------------------
+-- Schema mega_warez_db
+-- -----------------------------------------------------
+CREATE SCHEMA IF NOT EXISTS mega_warez_db DEFAULT CHARACTER SET utf8 ;
+USE mega_warez_db ;
+
+-- -----------------------------------------------------
+-- Table usuario
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS usuario (
+  usu_id INT NOT NULL AUTO_INCREMENT,
+  usu_username VARCHAR(45) NOT NULL,
+  usu_password VARCHAR(32) NOT NULL,
+  usu_create_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  usu_update DATETIME NULL,
+  PRIMARY KEY (usu_id))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table sesion`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS sesion (
+  ses_id INT NOT NULL AUTO_INCREMENT,
+  usuario_id INT NOT NULL,
+  ses_token VARCHAR(32) NOT NULL,
+  ses_create_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (ses_id),
+  INDEX fk_sesion_usuario_idx (usuario_id ASC) VISIBLE,
+  CONSTRAINT fk_sesion_usuario
+    FOREIGN KEY (usuario_id)
+    REFERENCES usuario (usu_id)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table categoria
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS categoria (
+  cat_id INT NOT NULL AUTO_INCREMENT,
+  cat_nombre VARCHAR(45) NOT NULL,
+  cat_create_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (cat_id))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table subcategoria
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS subcategoria (
+  scat_id INT NOT NULL AUTO_INCREMENT,
+  categoria_id INT NOT NULL,
+  scat_nombre VARCHAR(45) NOT NULL,
+  scat_create_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (scat_id),
+  INDEX fk_subcategoria_categoria1_idx (categoria_id ASC) VISIBLE,
+  CONSTRAINT fk_subcategoria_categoria1
+    FOREIGN KEY (categoria_id)
+    REFERENCES categoria (cat_id)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table articulo
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS articulo (
+  art_id INT NOT NULL AUTO_INCREMENT,
+  subcategoria_id INT NOT NULL,
+  art_nombre VARCHAR(45) NOT NULL,
+  art_create_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (art_id),
+  INDEX fk_item_subcategoria1_idx (subcategoria_id ASC) VISIBLE,
+  CONSTRAINT fk_item_subcategoria1
+    FOREIGN KEY (subcategoria_id)
+    REFERENCES subcategoria (scat_id)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table descarga
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS descarga (
+  des_id INT NOT NULL AUTO_INCREMENT,
+  usuario_id INT NOT NULL,
+  articulo_id INT NOT NULL,
+  des_create_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (des_id),
+  INDEX fk_descarga_usuario1_idx (usuario_id ASC) VISIBLE,
+  INDEX fk_descarga_item1_idx (articulo_id ASC) VISIBLE,
+  INDEX index (usuario_id ASC, articulo_id ASC) VISIBLE,
+  CONSTRAINT fk_descarga_usuario1
+    FOREIGN KEY (usuario_id)
+    REFERENCES usuario (usu_id)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT fk_descarga_item1
+    FOREIGN KEY (articulo_id)
+    REFERENCES articulo (art_id)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
